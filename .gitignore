@@ -1,0 +1,13 @@
+.pydevproject
+dist/*
+package-lock.json
+package.json
+.project
+.settings
+.tern-project
+node_modules
+build
+src/zincjs_group_exporter.egg-info/*
+src/zincjs_group_exporter/__pycache__/*
+venv
+
