@@ -17,13 +17,30 @@ class PyZincExport(object):
         self._context.getGlyphmodule().defineStandardGlyphs()
         self._default_region = self._context.getDefaultRegion()
         self._logger = self._context.getLogger()
+        self._materialModule = self._context.getMaterialmodule()
+        self._materialModule.defineStandardMaterials()
+        self._materialIterator = self._materialModule.createMaterialiterator()
         '''Export To ZincJS format'''
         #self.exportWebGLJson()
         '''Export graphics into JSON format'''
         numOfMessages = self._logger.getNumberOfMessages()
         for i in range(1, numOfMessages+1):
             print(self._logger.getMessageTextAtIndex(i))
-                
+            
+    def getNextMaterial(self):
+        '''
+        Go through the material module to find the next suitable colour
+        '''
+        material = self._materialIterator.next()
+        if material.isValid():
+            alpha = material.getAttributeReal(material.ATTRIBUTE_ALPHA) 
+            if 1.0 > alpha:
+                return self.getNextMaterial()
+            else:
+                return material
+        else:
+            self._materialIterator = self._materialModule.createMaterialiterator()
+            return self.getNextMaterial()
         
     def exportWebGLJson(self, region):
         '''
@@ -64,17 +81,47 @@ class PyZincExport(object):
         surface.setSubgroupField(group)
         ''' Setting exterior only should reduce export size without compromising quality '''
         surface.setExterior(True)
+        material = self.getNextMaterial()
+        surface.setMaterial(material)
         # Let the scene render the scene.
         scene.endChange()
         # createSurfaceGraphics end
- 
+        
+    def createGlyphGraphics(self, region):
+        '''
+        Create the glyph graphics using the finite element field 'coordinates'.
+        '''
+        scene = region.getScene()
+        fieldmodule = region.getFieldmodule()
+        scene.beginChange()
+        glyph = scene.createGraphicsPoints()
+        glyph.setFieldDomainType(Field.DOMAIN_TYPE_DATAPOINTS)
+        finite_element_field = fieldmodule.findFieldByName('data_coordinates')
+        glyph.setCoordinateField(finite_element_field)
+        pointAttr = glyph.getGraphicspointattributes()
+        label_field = fieldmodule.findFieldByName('data_label')
+        pointAttr.setLabelField(label_field)
+        sphere = self._context.getGlyphmodule().findGlyphByGlyphShapeType(Glyph.SHAPE_TYPE_SPHERE)
+        pointAttr.setGlyph(sphere)
+        # Let the scene render the scene.
+        scene.endChange()
+        # createSurfaceGraphics end
+
         
     def generateGraphics(self, list):
         for item in list:
             region = item[0]
+            fm = region.getFieldmodule()
+            #datapoints = fm.findNodesetByName("datapoints")
+            mesh = fm.findMeshByDimension(3)
             groupList = item[1]
             for group in groupList:
-                self.createSurfaceGraphics(region, group)
+                elementField = group.getFieldElementGroup(mesh)
+                meshGroup = elementField.getMeshGroup()
+                if meshGroup.getSize() > 0:
+                    self.createSurfaceGraphics(region, group)
+        #    if datapoints.getSize() > 0:
+        #        self.createGlyphGraphics(region)
             
     def readMesh(self, files):
         '''
@@ -85,8 +132,11 @@ class PyZincExport(object):
         sir = self._default_region.createStreaminformationRegion()
         for x in files:
             sir.createStreamresourceFile(x)
+            #with open(x, 'r') as content_file:
+            #    buffer = content_file.read()
+            #    sir.createStreamresourceMemoryBuffer(buffer)
         self._default_region.read(sir)
-
+        
         
     '''Get groups in region'''
     def getGroupList(self, region):
