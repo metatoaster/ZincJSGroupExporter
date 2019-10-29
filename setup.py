@@ -60,7 +60,8 @@ setup(
     build_calmjs_artifacts=True,
     entry_points={
         'console_scripts': [
-            'zincjs_group_exporter = zincjs_group_exporter.app:main',
+            'zincjs_group_exporter_sanic = zincjs_group_exporter.app:main',
+            'zincjs_group_exporter = zincjs_group_exporter.api:main',
         ],
         'calmjs.module': [
             'zincjs_group_exporter = zincjs_group_exporter',

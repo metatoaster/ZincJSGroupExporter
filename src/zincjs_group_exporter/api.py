@@ -67,7 +67,7 @@ def export_threejs_cli(root, streams, annotations=None, subdir='output'):
             fd.write(data)
 
 
-if __name__ == '__main__':
+def main():
     import sys
     from os.path import isdir
 
@@ -87,3 +87,7 @@ if __name__ == '__main__':
         files = [open(p, 'r') for p in sys.argv[2:]]
 
     export_threejs_cli(root, files)
+
+
+if __name__ == '__main__':
+    main()
