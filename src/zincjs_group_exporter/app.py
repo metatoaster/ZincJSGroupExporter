@@ -8,9 +8,8 @@ from pkg_resources import get_distribution
 from sanic import Sanic
 from sanic.response import json, html, text, redirect
 from zincjs_group_exporter import zinc_group
-from zincjs_group_exporter import backend
+from zincjs_group_exporter.api import export_threejs, store
 
-db_src = 'sqlite://'
 app = Sanic()
 
 with open(join(dirname(__file__), 'static', 'view.json')) as vd:
@@ -19,25 +18,7 @@ with open(join(dirname(__file__), 'static', 'view.json')) as vd:
 bundle_js = get_distribution('zincjs_group_exporter').get_metadata(
     'calmjs_artifacts/bundle.js')
 
-store = backend.Store(db_src)
 logger = logging.getLogger(__name__)
-
-def build(inputs):
-    myExport = zinc_group.PyZincExport()
-    model = myExport.outputModel(inputs, [])
-    job = backend.Job()
-    job.timestamp = int(time())
-    for data in model:
-        resource = backend.Resource()
-        resource.data = data
-        job.resources.append(resource)
-    response = loads(job.resources[0].data)
-    store.add(job)
-    for idx, obj in enumerate(response, 1):
-        resource_id = job.resources[idx].id
-        obj['URL'] = './output/%d' % resource_id
-    return response
-        
 
 @app.route('/output/<resource_id:int>')
 async def output(request, resource_id):
@@ -54,7 +35,7 @@ async def getZincJSModels(request):
                 filelocation = path + "/" + str(v)
                 inputs.append(filelocation) 
     try:
-        response = build(inputs)
+        response = export_threejs(inputs)
     except Exception as e:
         logger.exception('error while outputting mesh')
         return json({'error': 'error outputting mesh: ' + str(e)}, status=400)

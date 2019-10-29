@@ -48,11 +48,6 @@ class Store(object):
         sess.add(data)
         sess.commit()
 
-    def update(self, data):
-        sess = self.Session()
-        sess.update(data)
-        sess.commit()
-
     def query_resource(self, resource_id):
         sess = self.Session()
         obj = sess.query(Resource).filter_by(id=resource_id).first()

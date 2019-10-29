@@ -26,14 +26,14 @@ class PyZincExport(object):
         numOfMessages = self._logger.getNumberOfMessages()
         for i in range(1, numOfMessages+1):
             print(self._logger.getMessageTextAtIndex(i))
-            
+
     def getNextMaterial(self):
         '''
         Go through the material module to find the next suitable colour
         '''
         material = self._materialIterator.next()
         if material.isValid():
-            alpha = material.getAttributeReal(material.ATTRIBUTE_ALPHA) 
+            alpha = material.getAttributeReal(material.ATTRIBUTE_ALPHA)
             if 1.0 > alpha:
                 return self.getNextMaterial()
             else:
@@ -41,7 +41,7 @@ class PyZincExport(object):
         else:
             self._materialIterator = self._materialModule.createMaterialiterator()
             return self.getNextMaterial()
-        
+
     def exportWebGLJson(self, region):
         '''
         Export graphics into JSON format, one json export represents one
@@ -60,8 +60,8 @@ class PyZincExport(object):
             resources.append(sceneSR.createStreamresourceMemory())
         scene.write(sceneSR)
         '''Write out each resource into their own file'''
-        return [resources[i].getBuffer()[1].decode('utf-8') for i in range(number)]
-        
+        return [resources[i].getBuffer()[1] for i in range(number)]
+
     def createSurfaceGraphics(self, region, group):
         '''
         Create the surface graphics using the finite element field 'coordinates'.
@@ -86,7 +86,7 @@ class PyZincExport(object):
         # Let the scene render the scene.
         scene.endChange()
         # createSurfaceGraphics end
-        
+
     def createGlyphGraphics(self, region):
         '''
         Create the glyph graphics using the finite element field 'coordinates'.
@@ -107,7 +107,7 @@ class PyZincExport(object):
         scene.endChange()
         # createSurfaceGraphics end
 
-        
+
     def generateGraphics(self, list):
         for item in list:
             region = item[0]
@@ -122,13 +122,14 @@ class PyZincExport(object):
                     self.createSurfaceGraphics(region, group)
         #    if datapoints.getSize() > 0:
         #        self.createGlyphGraphics(region)
-            
+
     def readMesh(self, files):
         '''
-        Create a stream information then call createStreamresourceFile 
+        Create a stream information then call createStreamresourceFile
         with the files you want to read into PyZinc
         '''
         print(files)
+
         sir = self._default_region.createStreaminformationRegion()
         for x in files:
             sir.createStreamresourceFile(x)
@@ -136,8 +137,19 @@ class PyZincExport(object):
             #    buffer = content_file.read()
             #    sir.createStreamresourceMemoryBuffer(buffer)
         self._default_region.read(sir)
-        
-        
+
+    def readMeshFromStreamToRegion(self, streams):
+        '''
+        This takes in a stream of human readable text, before passing
+        whatever is read to createStreamresourceMemoryBuffer created by
+        createStreaminformationRegion.
+        '''
+
+        sir = self._default_region.createStreaminformationRegion()
+        for stream in streams:
+            sir.createStreamresourceMemoryBuffer(stream.read())
+        self._default_region.read(sir)
+
     '''Get groups in region'''
     def getGroupList(self, region):
         groups = []
@@ -163,14 +175,14 @@ class PyZincExport(object):
             regionList.extend(siblingRegions)
         regionList.append(region)
         return regionList
-        
+
     def outputName(self, list):
         for item in list:
             region = item[0]
             groupList = item[1]
             groupName = []
             for group in groupList:
-                if group.isValid(): 
+                if group.isValid():
                     groupName.append(group.getName())
 
     def outputModel(self, files, annotations):
@@ -179,7 +191,15 @@ class PyZincExport(object):
         module.
         """
         self.readMesh(files)
-        regionList = self.getRegionsList(self._default_region)
+        return self.outputModelFromRegion(self._default_region, annotations)
+
+
+    def outputModelFromStreams(self, streams, annotations):
+        self.readMeshFromStreamToRegion(streams)
+        return self.outputModelFromRegion(self._default_region, annotations)
+
+    def outputModelFromRegion(self, region, annotations):
+        regionList = self.getRegionsList(region)
         regionGroupList = []
         for region in regionList:
             groups = self.getGroupList(region)
