@@ -66,7 +66,7 @@ setup(
             'zincjs_group_exporter = zincjs_group_exporter',
         ],
         'calmjs.artifacts': [
-            'bundle.js = calmjs.webpack.artifact:complete_webpack',
+            'bundle.js = calmjs.webpack.artifact:optimize_webpack',
         ],
     },
     # test_suite="",
