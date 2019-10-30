@@ -3,14 +3,6 @@ var physiomeportal = require("physiomeportal");
 var main = function()  {
   var UIIsReady = true;
   var organViewer = undefined;
-  var _this = this;
-  
-  
-  this.readModels = function(file) {
-        var argumentString = "inputs=" + file;
-        var finalURL = "./getZincJSModels?" + argumentString;
-        organViewer.loadOrgansFromURL(finalURL, undefined, undefined, "heart", "static/view.json");
-  }
 
   /**
    * Initialise all the panels required for PJP to function correctly.
@@ -30,6 +22,7 @@ var main = function()  {
       organViewerDialog.dock();
       organViewerDialog.hideTitlebar();
       organViewerDialog.destroyModuleOnClose = true;
+      organViewer.loadOrgansFromURL("./output/0", undefined, undefined, "heart", "./view.json");
   }
 
   var initialise = function() {
@@ -41,8 +34,6 @@ var main = function()  {
 
 var createVisualisation = function() {
     var myModule = new main();
-    myModule.readModels("static/test.exf");
-
 }
 
 window.document.addEventListener('DOMContentLoaded', createVisualisation);
