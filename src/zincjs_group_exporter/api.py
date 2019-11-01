@@ -44,7 +44,7 @@ def getZincJSModels(request):
     export_inputs(inputs)
 
 
-def export_threejs_cli(root, streams, annotations=None, subdir='output'):
+def export_threejs_cli(root, streams, annotations=None, subdir='scaffold'):
     if annotations is None:
         annotations = []
 

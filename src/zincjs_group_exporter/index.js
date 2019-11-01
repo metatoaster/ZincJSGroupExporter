@@ -22,7 +22,7 @@ var main = function()  {
       organViewerDialog.dock();
       organViewerDialog.hideTitlebar();
       organViewerDialog.destroyModuleOnClose = true;
-      organViewer.loadOrgansFromURL("./output/0", undefined, undefined, "heart", "./view.json");
+      organViewer.loadOrgansFromURL("./scaffold/0", undefined, undefined, "heart", "./view.json");
   }
 
   var initialise = function() {

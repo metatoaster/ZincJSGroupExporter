@@ -20,11 +20,11 @@ class CliTestCase(unittest.TestCase):
         with open(target, 'r') as fd:
             export_threejs_cli(self.root, [fd])
 
-        outdir = join(self.root, 'output')
+        outdir = join(self.root, 'scaffold')
         self.assertTrue(exists(outdir))
         self.assertEqual(19, len(listdir(outdir)))
 
         with open(join(outdir, '0')) as fd:
             root_node = json.load(fd)
 
-        self.assertEqual(root_node[0]['URL'], './output/1')
+        self.assertEqual(root_node[0]['URL'], './scaffold/1')
