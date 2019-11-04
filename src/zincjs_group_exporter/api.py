@@ -27,7 +27,7 @@ def export_threejs(inputs):
     store.add(job)
     for idx, obj in enumerate(response, 1):
         resource_id = job.resources[idx].id
-        obj['URL'] = './output/%d' % resource_id
+        obj['URL'] = './scaffold/%d' % resource_id
     return response
 
 
@@ -60,7 +60,7 @@ def export_threejs_cli(root, streams, annotations=None, subdir='scaffold'):
             # resource.
             root = loads(data)
             for ref, obj in enumerate(root, 1):
-                obj['URL'] = './%s/%d' % (subdir, ref)
+                obj['URL'] = './%d' % ref
             data = dumps(root)
 
         with open(join(output_dir, str(idx)), 'w') as fd:

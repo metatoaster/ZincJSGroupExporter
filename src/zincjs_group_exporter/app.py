@@ -20,7 +20,7 @@ bundle_js = get_distribution('zincjs_group_exporter').get_metadata(
 
 logger = logging.getLogger(__name__)
 
-@app.route('/output/<resource_id:int>')
+@app.route('/scaffold/<resource_id:int>')
 async def output(request, resource_id):
     return json(store.query_resource(resource_id))
 
@@ -46,7 +46,7 @@ async def getZincJSModels(request):
 async def serve_js(request):
     return text(bundle_js, headers={'Content-Type': 'application/javascript'})
 
-@app.route('/static/view.json')
+@app.route('view.json')
 async def view(request):
     return json(view_json)
 

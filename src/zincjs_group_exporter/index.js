@@ -13,6 +13,8 @@ var main = function()  {
   var initialiseMain = function() {
       organViewer = new physiomeportal.OrgansViewer();
       var parent = document.getElementById("MAPcorePortalArea");
+      var model_root = parent.getAttribute('data-model');
+      var view_json = parent.getAttribute('data-view') || "./view.json";
       var organViewerDialog = new physiomeportal.OrgansViewerDialog(organViewer, parent);
       organViewer.setName("organViewer");
       organViewerDialog.setPosition(0, 0);
@@ -22,7 +24,7 @@ var main = function()  {
       organViewerDialog.dock();
       organViewerDialog.hideTitlebar();
       organViewerDialog.destroyModuleOnClose = true;
-      organViewer.loadOrgansFromURL("./scaffold/0", undefined, undefined, "heart", "./view.json");
+      organViewer.loadOrgansFromURL(model_root, undefined, undefined, "heart", view_json);
   }
 
   var initialise = function() {
