@@ -25,6 +25,9 @@ var main = function()  {
       organViewerDialog.hideTitlebar();
       organViewerDialog.destroyModuleOnClose = true;
       organViewer.loadOrgansFromURL(model_root, undefined, undefined, "heart", view_json);
+
+      parent.organViewer = organViewer;
+      parent.organViewerDialog = organViewerDialog;
   }
 
   var initialise = function() {
